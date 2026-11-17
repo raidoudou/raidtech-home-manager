@@ -166,7 +166,7 @@
                         <div class="rhm-brand-icon rhm-icon">tune</div>
                         <div>
                             <h1>Home Manager</h1>
-                            <p>Personnalise l’expérience d’accueil de Jellyfin Web et Emby. Choisis les utilisateurs, compose les sections et définis leur ordre depuis un espace unique.</p>
+                            <p>Personnalise l’expérience d’accueil de Jellyfin Web et Android TV. Ces deux clients partagent leurs préférences serveur. Configure aussi Emby séparément.</p>
                         </div>
                     </div>
                 </header>
@@ -195,8 +195,8 @@
                     </section>
 
                     <div class="rhm-policy-heading">
-                        <div><h2>Applications & politiques</h2><p>Deux expériences, deux configurations indépendantes.</p></div>
-                        <div class="rhm-status-pill"><span>2 applications disponibles</span></div>
+                        <div><h2>Applications & politiques</h2><p>Jellyfin Web et Android TV partagent le même profil serveur. Emby reste indépendant.</p></div>
+                        <div class="rhm-status-pill"><span>2 profils · 3 clients couverts</span></div>
                     </div>
                     <div id="policyFields"></div>
 
@@ -211,7 +211,7 @@
             const RaidtechHomeManager = {
                 pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
                 clients: [
-                    { id: 'web', label: 'Jellyfin Web', subtitle: 'Interface web Raidtech Media Server', icon: 'language', defaultIdentifier: 'emby' },
+                    { id: 'web', label: 'Jellyfin Web + Android TV', subtitle: 'Préférences partagées · client emby · usersettings', icon: 'devices', defaultIdentifier: 'emby' },
                     { id: 'emby', label: 'Emby', subtitle: 'Application Emby', icon: 'smart_display', defaultIdentifier: '' }
                 ],
                 sections: [
