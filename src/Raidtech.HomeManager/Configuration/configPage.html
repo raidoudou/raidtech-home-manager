@@ -40,7 +40,8 @@
             const RaidtechHomeManager = {
                 pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
                 clients: [
-                    { id: 'web', label: 'Jellyfin Web', defaultIdentifier: 'Jellyfin Web' },
+                    { id: 'web', label: 'Jellyfin Web', defaultIdentifier: 'emby' },
+                    { id: 'emby', label: 'Emby', defaultIdentifier: '' },
                     { id: 'androidtv', label: 'Android TV', defaultIdentifier: 'Jellyfin Android TV' },
                     { id: 'android', label: 'Android', defaultIdentifier: 'Jellyfin Android' },
                     { id: 'ios', label: 'iOS', defaultIdentifier: 'Jellyfin iOS' },
@@ -56,6 +57,8 @@
             const fields = document.querySelector('#policyFields');
             const status = document.querySelector('#status');
 
+            let availableUsers = [];
+
             function renderPolicies(policies) {
                 fields.innerHTML = '';
                 RaidtechHomeManager.clients.forEach(client => {
@@ -63,6 +66,8 @@
                         ClientFamily: client.id,
                         ClientIdentifier: client.defaultIdentifier,
                         Enabled: false,
+                        ApplyToAllUsers: false,
+                        UserIds: [],
                         Sections: []
                     };
                     const section = document.createElement('section');
@@ -93,6 +98,41 @@
                     identifier.value = policy.ClientIdentifier || '';
                     identifier.placeholder = 'Must match the client string sent to Jellyfin';
 
+                    const allUsersLabel = document.createElement('label');
+                    allUsersLabel.className = 'emby-checkbox-label';
+                    allUsersLabel.style.display = 'block';
+                    const allUsers = document.createElement('input');
+                    allUsers.type = 'checkbox';
+                    allUsers.is = 'emby-checkbox';
+                    allUsers.dataset.allUsers = client.id;
+                    allUsers.checked = policy.ApplyToAllUsers === true;
+                    const allUsersText = document.createElement('span');
+                    allUsersText.textContent = 'Apply to all users';
+                    allUsersLabel.append(allUsers, allUsersText);
+
+                    const usersLabel = document.createElement('label');
+                    usersLabel.className = 'inputLabel inputLabelUnfocused';
+                    usersLabel.textContent = 'Selected users (Ctrl/Cmd to select multiple)';
+                    const usersSelect = document.createElement('select');
+                    usersSelect.multiple = true;
+                    usersSelect.size = Math.min(Math.max(availableUsers.length, 3), 8);
+                    usersSelect.dataset.users = client.id;
+                    usersSelect.style.display = 'block';
+                    usersSelect.style.minWidth = '18em';
+                    const selectedIds = new Set((policy.UserIds || []).map(id => String(id).toLowerCase()));
+                    availableUsers.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.Id;
+                        option.textContent = user.Name;
+                        option.selected = selectedIds.has(String(user.Id).toLowerCase());
+                        usersSelect.append(option);
+                    });
+                    usersSelect.disabled = allUsers.checked;
+
+                    allUsers.addEventListener('change', () => {
+                        usersSelect.disabled = allUsers.checked;
+                    });
+
                     const sectionsLabel = document.createElement('label');
                     sectionsLabel.className = 'inputLabel inputLabelUnfocused';
                     sectionsLabel.textContent = 'Ordered home sections (maximum 10)';
@@ -107,7 +147,7 @@
                     description.className = 'fieldDescription';
                     description.textContent = 'Allowed values: ' + RaidtechHomeManager.sectionTypes.join(', ');
 
-                    section.append(heading, enabledLabel, identifierLabel, identifier, sectionsLabel, sections, description);
+                    section.append(heading, enabledLabel, identifierLabel, identifier, allUsersLabel, usersLabel, usersSelect, sectionsLabel, sections, description);
                     fields.append(section);
                 });
             }
@@ -118,8 +158,11 @@
                     .then(config => {
                         document.querySelector('#DisplayPreferencesId').value = config.DisplayPreferencesId || 'usersettings';
                         document.querySelector('#EnforcementEnabled').checked = config.EnforcementEnabled === true;
-                        renderPolicies(config.Policies || []);
-                        Dashboard.hideLoadingMsg();
+                        return ApiClient.getUsers().then(users => {
+                            availableUsers = users || [];
+                            renderPolicies(config.Policies || []);
+                            Dashboard.hideLoadingMsg();
+                        });
                     })
                     .catch(error => {
                         Dashboard.hideLoadingMsg();
@@ -138,6 +181,8 @@
                             ClientFamily: client.id,
                             ClientIdentifier: fields.querySelector('[data-identifier="' + client.id + '"]').value.trim(),
                             Enabled: fields.querySelector('[data-enabled="' + client.id + '"]').checked,
+                            ApplyToAllUsers: fields.querySelector('[data-all-users="' + client.id + '"]').checked,
+                            UserIds: Array.from(fields.querySelector('[data-users="' + client.id + '"]').selectedOptions).map(option => option.value),
                             Sections: (fields.querySelector('[data-sections="' + client.id + '"]').value || '')
                                 .split(',')
                                 .map(value => value.trim())
