@@ -164,7 +164,7 @@
                         <div class="rhm-brand-icon rhm-icon">tune</div>
                         <div>
                             <h1>Home Manager</h1>
-                            <p>Compose l’écran d’accueil de chaque application, choisis qui bénéficie de tes réglages et maîtrise l’ordre des sections depuis un seul endroit.</p>
+                            <p>Personnalise l’expérience d’accueil de Jellyfin Web et Emby. Choisis les utilisateurs, compose les sections et définis leur ordre depuis un espace unique.</p>
                         </div>
                     </div>
                 </header>
@@ -193,7 +193,8 @@
                     </section>
 
                     <div class="rhm-policy-heading">
-                        <div><h2>Applications & politiques</h2><p>Configure chaque client indépendamment.</p></div>
+                        <div><h2>Applications & politiques</h2><p>Deux expériences, deux configurations indépendantes.</p></div>
+                        <div class="rhm-status-pill"><span>2 applications disponibles</span></div>
                     </div>
                     <div id="policyFields"></div>
 
@@ -208,12 +209,8 @@
             const RaidtechHomeManager = {
                 pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
                 clients: [
-                    { id: 'web', label: 'Jellyfin Web', subtitle: 'Navigateur web Jellyfin', icon: 'language', defaultIdentifier: 'emby' },
-                    { id: 'emby', label: 'Emby', subtitle: 'Application Emby', icon: 'smart_display', defaultIdentifier: '' },
-                    { id: 'androidtv', label: 'Android TV', subtitle: 'Téléviseurs et boîtiers Android TV', icon: 'tv', defaultIdentifier: 'Jellyfin Android TV' },
-                    { id: 'android', label: 'Android', subtitle: 'Téléphones et tablettes Android', icon: 'phone_android', defaultIdentifier: 'Jellyfin Android' },
-                    { id: 'ios', label: 'iOS', subtitle: 'iPhone et iPad', icon: 'phone_iphone', defaultIdentifier: 'Jellyfin iOS' },
-                    { id: 'other', label: 'Autres clients', subtitle: 'Client personnalisé', icon: 'devices', defaultIdentifier: '' }
+                    { id: 'web', label: 'Jellyfin Web', subtitle: 'Interface web Raidtech Media Server', icon: 'language', defaultIdentifier: 'emby' },
+                    { id: 'emby', label: 'Emby', subtitle: 'Application Emby', icon: 'smart_display', defaultIdentifier: '' }
                 ],
                 sections: [
                     { id:'SmallLibraryTiles', label:'Mes médiathèques', description:'Tuiles des bibliothèques', icon:'video_library' },
