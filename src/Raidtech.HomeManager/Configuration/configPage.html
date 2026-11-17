@@ -324,7 +324,7 @@
                                 ClientFamily: client.id,
                                 ClientIdentifier: card.querySelector('[data-identifier="' + client.id + '"]').value.trim(),
                                 Enabled: card.querySelector('[data-enabled="' + client.id + '"]').checked,
-                                ApplyToAllUsers: card.querySelector('[data-allUsers="' + client.id + '"]').checked,
+                                ApplyToAllUsers: card.querySelector('[data-all-users="' + client.id + '"]').checked,
                                 UserIds: Array.from(card.querySelector('[data-users="' + client.id + '"]').selectedOptions).map(option => option.value),
                                 Sections: selectedSections
                             };
