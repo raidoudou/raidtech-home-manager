@@ -39,10 +39,10 @@
             function renderPolicies(policies) {
                 fields.innerHTML = '';
                 RaidtechHomeManager.clients.forEach(client => {
-                    const policy = policies.find(p => p.clientFamily === client.id) || {
+                    const policy = policies.find(p => p.ClientFamily === client.id) || {
                         clientFamily: client.id,
-                        enabled: false,
-                        sections: []
+                        Enabled: false,
+                        Sections: []
                     };
                     const section = document.createElement('section');
                     section.className = 'verticalSection';
@@ -55,7 +55,7 @@
                     checkbox.type = 'checkbox';
                     checkbox.is = 'emby-checkbox';
                     checkbox.dataset.client = client.id;
-                    checkbox.checked = policy.enabled;
+                    checkbox.checked = policy.Enabled;
                     const span = document.createElement('span');
                     span.textContent = 'Enable policy (enforcement not implemented yet)';
                     label.append(checkbox, span);
@@ -66,7 +66,7 @@
                     input.type = 'text';
                     input.is = 'emby-input';
                     input.dataset.sections = client.id;
-                    input.value = (policy.sections || []).join(', ');
+                    input.value = (policy.Sections || []).join(', ');
                     input.placeholder = 'e.g. continueWatching, nextUp';
                     const description = document.createElement('div');
                     description.className = 'fieldDescription';
