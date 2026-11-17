@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Jellyfin.Database.Implementations.Entities;
 using Jellyfin.Database.Implementations.Enums;
 using MediaBrowser.Common.Extensions;
@@ -97,7 +95,7 @@ public sealed class HomePolicySyncTask : IScheduledTask
             var invalid = false;
             foreach (var section in policy.Sections)
             {
-                if (!Enum.TryParse(section, true, out HomeSectionType parsed))
+                if (!Enum.TryParse(section, true, out HomeSectionType parsed) || !Enum.IsDefined(parsed))
                 {
                     _logger.LogWarning("Unknown home section {Section} in policy {ClientFamily}; policy skipped.", section, policy.ClientFamily);
                     invalid = true;
