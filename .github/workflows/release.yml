@@ -6,7 +6,7 @@ on:
       version:
         description: "Version à publier (ex. 0.2.1.0)"
         required: true
-        default: "0.2.1.0"
+        default: "0.2.2.2"
   push:
     tags:
       - "v*"
@@ -48,7 +48,7 @@ jobs:
         run: dotnet restore Raidtech.HomeManager.sln
 
       - name: Build
-        run: dotnet publish src/Raidtech.HomeManager/Raidtech.HomeManager.csproj --configuration Release --no-restore --output ./publish
+        run: dotnet publish src/Raidtech.HomeManager/Raidtech.HomeManager.csproj --configuration Release --no-restore --output ./publish -p:Version=${{ steps.metadata.outputs.version }} -p:AssemblyVersion=${{ steps.metadata.outputs.version }} -p:FileVersion=${{ steps.metadata.outputs.version }} -p:InformationalVersion=${{ steps.metadata.outputs.version }}
 
       - name: Package plugin
         shell: bash
