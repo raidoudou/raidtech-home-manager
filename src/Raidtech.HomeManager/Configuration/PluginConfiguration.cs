@@ -39,7 +39,7 @@ public sealed class PluginConfiguration : BasePluginConfiguration
 public sealed class ClientHomePolicy
 {
     /// <summary>
-    /// Gets or sets the client family identifier (web, androidtv, android, ios, other).
+    /// Gets or sets the client family identifier (web, emby).
     /// </summary>
     public string ClientFamily { get; set; } = "web";
 
