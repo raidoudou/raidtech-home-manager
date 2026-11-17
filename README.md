@@ -6,7 +6,7 @@ Administrator-managed home-section policies for Jellyfin 12.4.
 
 ## Current features
 
-- Separate policy entries for Jellyfin Web and Emby, plus Android TV, Android, iOS and Other clients.
+- Separate, independent policy entries for Jellyfin Web and Emby.
 - Editable exact Jellyfin display-preferences client identifier.
 - Configurable display-preferences ID (default: `usersettings`).
 - Global enforcement safety switch, disabled by default.
@@ -18,14 +18,14 @@ Administrator-managed home-section policies for Jellyfin 12.4.
 
 Jellyfin stores display preferences per user and client identifier. The plugin uses Jellyfin's `IDisplayPreferencesManager` and the server's `DisplayPreferences.HomeSections` model. This is a server-side preference mechanism; it does not force a client to render a section that its UI does not implement, and it does not prove that every native app uses the same preference ID or client identifier.
 
-The Jellyfin Web identifier `emby` was observed in a live Jellyfin Web request during initial testing. The separate Emby app identifier is not yet verified and must be confirmed from that app before enabling its policy. Android TV, Android and iOS identifiers shown in the configuration page are suggestions only. Verify the exact client value sent by each installed app before enabling its policy. Unsupported clients must remain disabled.
+The Jellyfin Web identifier `emby` was observed in a live Jellyfin Web request during initial testing. The Emby app identifier is not yet verified and must be confirmed from that app before enabling its policy.
 
 ## Configuration
 
 1. Build and install the plugin in a non-production Jellyfin 12.4 test server.
 2. Open **Dashboard → Plugins → Raidtech Home Manager**.
 3. Keep **Enable enforcement globally** disabled initially.
-4. Set the display-preferences ID and exact client identifier for the target client.
+4. Set the display-preferences ID and exact client identifier independently for Jellyfin Web or Emby.
 5. Enable one client policy, select the intended users (or explicitly choose all users), and configure its ordered section names.
 6. Run **Dashboard → Scheduled Tasks → Raidtech Home Manager: Synchronize home sections** manually.
 7. Verify the result with a test account and the intended client before enabling periodic enforcement.
