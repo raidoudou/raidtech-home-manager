@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "0.2.2.2",
+        "changelog": "See the GitHub release notes.",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/raidoudou/raidtech-home-manager/releases/download/v0.2.2.2/Raidtech.HomeManager.zip",
+        "checksum": "5859713d2be32b4ac2524d557fd4e9a0",
+        "timestamp": "2026-11-17 15:29:23"
+      },
+      {
         "version": "0.2.2.1",
         "changelog": "See the GitHub release notes.",
         "targetAbi": "12.0.0.0",
