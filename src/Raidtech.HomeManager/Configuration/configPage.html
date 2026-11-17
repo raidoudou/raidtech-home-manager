@@ -1,154 +1,292 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8">
     <title>Raidtech Home Manager</title>
+    <style>
+        #RaidtechHomeManagerPage { color: var(--primary-text-color, inherit); }
+        #RaidtechHomeManagerPage .rhm-intro { max-width: 900px; opacity: .82; margin-bottom: 1.4em; }
+        #RaidtechHomeManagerPage .rhm-global {
+            background: var(--card-background, rgba(255,255,255,.045));
+            border: 1px solid var(-- เบorder-color, rgba(255,255,255,.10));
+            border-radius: 12px; padding: 1.2em; margin: 1.2em 0 1.5em;
+        }
+        #RaidtechHomeManagerPage .rhm-global h3 { margin-top: 0; }
+        #RaidtechHomeManagerPage .rhm-policy {
+            background: var(--card-background, rgba(255,255,255,.035));
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 12px; padding: 1.15em; margin: 1em 0;
+        }
+        #RaidtechHomeManagerPage .rhm-policy-header {
+            display:flex; align-items:center; justify-content:space-between;
+            gap:1em; flex-wrap:wrap; margin-bottom:.9em;
+        }
+        #RaidtechHomeManagerPage .rhm-policy-header h3 { margin:0; font-size:1.25em; }
+        #RaidtechHomeManagerPage .rhm-policy-subtitle { opacity:.68; font-size:.9em; margin-top:.2em; }
+        #RaidtechHomeManagerPage .rhm-policy-body { display:grid; grid-template-columns:minmax(230px, .8fr) minmax(320px, 1.5fr); gap:1.2em; }
+        #RaidtechHomeManagerPage .rhm-panel {
+            background:rgba(127,127,127,.07); border-radius:9px; padding:1em; min-width:0;
+        }
+        #RaidtechHomeManagerPage .rhm-panel h4 { margin:0 0 .8em; font-size:1em; }
+        #RaidtechHomeManagerPage .rhm-field { margin:.8em 0; }
+        #RaidtechHomeManagerPage .rhm-field label { display:block; margin-bottom:.35em; }
+        #RaidtechHomeManagerPage .rhm-field input[type=text] { width:100%; max-width:100%; box-sizing:border-box; }
+        #RaidtechHomeManagerPage .rhm-help { font-size:.85em; opacity:.68; margin-top:.35em; }
+        #RaidtechHomeManagerPage .rhm-users { width:100%; min-height:9em; }
+        #RaidtechHomeManagerPage .rhm-sections { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.55em; }
+        #RaidtechHomeManagerPage .rhm-section {
+            display:flex; align-items:center; gap:.65em; min-width:0;
+            padding:.65em .7em; border-radius:8px;
+            background:rgba(127,127,127,.10); border:1px solid transparent;
+        }
+        #RaidtechHomeManagerPage .rhm-section.selected { border-color:var(--theme-primary-color, #00a4dc); background:rgba(0,164,220,.10); }
+        #RaidtechHomeManagerPage .rhm-section input { flex:0 0 auto; }
+        #RaidtechHomeManagerPage .rhm-section-name { flex:1; min-width:0; }
+        #RaidtechHomeManagerPage .rhm-section-name strong { display:block; font-size:.92em; }
+        #RaidtechHomeManagerPage .rhm-section-name small { display:block; opacity:.58; font-size:.76em; overflow-wrap:anywhere; }
+        #RaidtechHomeManagerPage .rhm-order { display:flex; gap:.2em; flex:0 0 auto; }
+        #RaidtechHomeManagerPage .rhm-order button { min-width:2em; padding:.25em; border-radius:6px; }
+        #RaidtechHomeManagerPage .rhm-selected-count { font-size:.85em; opacity:.7; margin:.5em 0 .8em; }
+        #RaidtechHomeManagerPage .rhm-actions { display:flex; gap:.5em; flex-wrap:wrap; margin-top:.8em; }
+        #RaidtechHomeManagerPage .rhm-muted { opacity:.55; }
+        #RaidtechHomeManagerPage .rhm-global-warning { color:var(--warning-color, #e6ad35); }
+        #RaidtechHomeManagerPage #status { margin-top:1em; }
+        @media(max-width:800px) {
+            #RaidtechHomeManagerPage .rhm-policy-body { grid-template-columns:1fr; }
+            #RaidtechHomeManagerPage .rhm-sections { grid-template-columns:1fr; }
+        }
+    </style>
 </head>
 <body>
     <div id="RaidtechHomeManagerPage" data-role="page" class="page type-interior pluginConfigurationPage">
         <div data-role="content">
             <div class="content-primary">
                 <h2>Raidtech Home Manager</h2>
-                <p>Define the server-side home-section policy separately for each client identifier.</p>
-                <div class="warningFieldDescription" style="margin-bottom:1em">
-                    <strong>Important:</strong> Jellyfin stores display preferences per user and per client identifier.
-                    A policy only affects clients that use the configured identifier and the server-side home-section
-                    preference API. This cannot force a client to render unsupported UI.
-                </div>
+                <p class="rhm-intro">Organise l'écran d'accueil de tes utilisateurs selon leur application Jellyfin ou Emby. Choisis les sections à afficher et leur ordre, sans avoir à saisir leurs identifiants techniques.</p>
+
                 <form id="RaidtechHomeManagerForm">
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="DisplayPreferencesId">Display preferences ID</label>
-                        <input id="DisplayPreferencesId" name="DisplayPreferencesId" type="text" is="emby-input" />
-                        <div class="fieldDescription">Usually usersettings. Keep this unchanged unless you have verified another identifier.</div>
+                    <div class="rhm-global">
+                        <h3>Paramètres généraux</h3>
+                        <div class="rhm-field">
+                            <label class="inputLabel" for="DisplayPreferencesId">Identifiant des préférences d'affichage</label>
+                            <input id="DisplayPreferencesId" name="DisplayPreferencesId" type="text" is="emby-input" />
+                            <div class="rhm-help">Valeur habituelle : usersettings. Ne la modifie que si tu as vérifié un autre identifiant.</div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="EnforcementEnabled" type="checkbox" is="emby-checkbox" />
+                                <span>Activer l'application automatique des politiques</span>
+                            </label>
+                            <div class="rhm-help rhm-global-warning">Interrupteur général de sécurité. S'il est désactivé, aucune préférence utilisateur n'est modifiée.</div>
+                        </div>
                     </div>
-                    <div class="checkboxContainer checkboxContainer-withDescription">
-                        <label class="emby-checkbox-label">
-                            <input id="EnforcementEnabled" type="checkbox" is="emby-checkbox" />
-                            <span>Enable enforcement globally</span>
-                        </label>
-                        <div class="fieldDescription">When disabled, the scheduled task performs no changes. Enable only after verifying each client identifier.</div>
-                    </div>
+
                     <div id="policyFields"></div>
+
                     <button is="emby-button" type="submit" class="raised button-submit block emby-button">
-                        <span>Save configuration</span>
+                        <span>Enregistrer la configuration</span>
                     </button>
                 </form>
-                <div id="status" class="fieldDescription"></div>
+                <div id="status" class="fieldDescription" role="status"></div>
             </div>
         </div>
         <script>
             const RaidtechHomeManager = {
                 pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
                 clients: [
-                    { id: 'web', label: 'Jellyfin Web', defaultIdentifier: 'emby' },
-                    { id: 'emby', label: 'Emby', defaultIdentifier: '' },
-                    { id: 'androidtv', label: 'Android TV', defaultIdentifier: 'Jellyfin Android TV' },
-                    { id: 'android', label: 'Android', defaultIdentifier: 'Jellyfin Android' },
-                    { id: 'ios', label: 'iOS', defaultIdentifier: 'Jellyfin iOS' },
-                    { id: 'other', label: 'Other clients', defaultIdentifier: '' }
+                    { id: 'web', label: 'Jellyfin Web', subtitle: 'Navigateur web Jellyfin', defaultIdentifier: 'emby' },
+                    { id: 'emby', label: 'Emby', subtitle: 'Application Emby', defaultIdentifier: '' },
+                    { id: 'androidtv', label: 'Android TV', subtitle: 'Téléviseurs et boîtiers Android TV', defaultIdentifier: 'Jellyfin Android TV' },
+                    { id: 'android', label: 'Android', subtitle: 'Téléphones et tablettes Android', defaultIdentifier: 'Jellyfin Android' },
+                    { id: 'ios', label: 'iOS', subtitle: 'iPhone et iPad', defaultIdentifier: 'Jellyfin iOS' },
+                    { id: 'other', label: 'Autres clients', subtitle: 'Client personnalisé', defaultIdentifier: '' }
                 ],
-                sectionTypes: [
-                    'None', 'SmallLibraryTiles', 'LibraryButtons', 'ActiveRecordings',
-                    'Resume', 'ResumeAudio', 'LatestMedia', 'NextUp', 'LiveTv', 'ResumeBook'
+                sections: [
+                    { id:'SmallLibraryTiles', label:'Mes médiathèques', description:'Tuiles des bibliothèques' },
+                    { id:'LibraryButtons', label:'Boutons des médiathèques', description:'Accès rapide aux bibliothèques' },
+                    { id:'Resume', label:'Continuer de regarder', description:'Reprendre les films et séries' },
+                    { id:'ResumeAudio', label:'Reprendre la musique', description:'Écoutes audio en cours' },
+                    { id:'LatestMedia', label:'Derniers médias', description:'Ajouts récents aux bibliothèques' },
+                    { id:'NextUp', label:'À suivre', description:'Prochains épisodes' },
+                    { id:'ActiveRecordings', label:'Enregistrements actifs', description:'Enregistrements TV en cours' },
+                    { id:'LiveTv', label:'Télévision en direct', description:'Programmes TV en direct' },
+                    { id:'ResumeBook', label:'Reprendre la lecture', description:'Livres en cours' },
+                    { id:'None', label:'Aucune section', description:'Désactive les sections de l’accueil' }
                 ]
             };
 
             const page = document.querySelector('#RaidtechHomeManagerPage');
             const fields = document.querySelector('#policyFields');
             const status = document.querySelector('#status');
-
             let availableUsers = [];
+
+            function makeCheckbox(labelText, checked, dataAttribute, clientId) {
+                const label = document.createElement('label');
+                label.className = 'emby-checkbox-label';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.is = 'emby-checkbox';
+                input.checked = checked === true;
+                input.dataset[dataAttribute] = clientId;
+                const span = document.createElement('span');
+                span.textContent = labelText;
+                label.append(input, span);
+                return { label, input };
+            }
+
+            function renderSectionChoices(clientId, savedSections) {
+                const selected = new Set(savedSections || []);
+                const ordered = (savedSections || []).filter(id => RaidtechHomeManager.sections.some(section => section.id === id));
+                const container = document.createElement('div');
+                const count = document.createElement('div');
+                count.className = 'rhm-selected-count';
+                const list = document.createElement('div');
+                list.className = 'rhm-sections';
+
+                function refresh() {
+                    count.textContent = ordered.length + ' section(s) sélectionnée(s), dans l’ordre d’affichage';
+                    list.innerHTML = '';
+                    RaidtechHomeManager.sections.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'rhm-section' + (selected.has(item.id) ? ' selected' : '');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = selected.has(item.id);
+                        checkbox.setAttribute('aria-label', 'Activer ' + item.label);
+                        checkbox.addEventListener('change', () => {
+                            if (checkbox.checked) {
+                                if (item.id === 'None') {
+                                    selected.clear(); ordered.splice(0, ordered.length); ordered.push('None');
+                                } else {
+                                    selected.delete('None');
+                                    const noneIndex = ordered.indexOf('None');
+                                    if (noneIndex >= 0) ordered.splice(noneIndex, 1);
+                                    if (!selected.has(item.id)) { selected.add(item.id); ordered.push(item.id); }
+                                }
+                            } else {
+                                selected.delete(item.id);
+                                const index = ordered.indexOf(item.id);
+                                if (index >= 0) ordered.splice(index, 1);
+                            }
+                            refresh();
+                        });
+
+                        const name = document.createElement('span');
+                        name.className = 'rhm-section-name';
+                        const strong = document.createElement('strong');
+                        strong.textContent = item.label;
+                        const small = document.createElement('small');
+                        small.textContent = item.description;
+                        name.append(strong, small);
+                        row.append(checkbox, name);
+
+                        if (selected.has(item.id)) {
+                            const order = document.createElement('span');
+                            order.className = 'rhm-order';
+                            const position = ordered.indexOf(item.id);
+                            const up = document.createElement('button');
+                            up.type = 'button'; up.textContent = '↑'; up.title = 'Monter';
+                            up.disabled = position <= 0;
+                            up.addEventListener('click', () => {
+                                if (position > 0) [ordered[position - 1], ordered[position]] = [ordered[position], ordered[position - 1]];
+                                refresh();
+                            });
+                            const down = document.createElement('button');
+                            down.type = 'button'; down.textContent = '↓'; down.title = 'Descendre';
+                            down.disabled = position < 0 || position >= ordered.length - 1;
+                            down.addEventListener('click', () => {
+                                if (position >= 0 && position < ordered.length - 1) [ordered[position], ordered[position + 1]] = [ordered[position + 1], ordered[position]];
+                                refresh();
+                            });
+                            order.append(up, down);
+                            row.append(order);
+                        }
+                        list.append(row);
+                    });
+                }
+                refresh();
+                container.append(count, list);
+                container.getSections = () => ordered.slice();
+                return container;
+            }
 
             function renderPolicies(policies) {
                 fields.innerHTML = '';
                 RaidtechHomeManager.clients.forEach(client => {
                     const policy = policies.find(p => p.ClientFamily === client.id) || {
-                        ClientFamily: client.id,
-                        ClientIdentifier: client.defaultIdentifier,
-                        Enabled: false,
-                        ApplyToAllUsers: false,
-                        UserIds: [],
-                        Sections: []
+                        ClientFamily: client.id, ClientIdentifier: client.defaultIdentifier,
+                        Enabled: false, ApplyToAllUsers: false, UserIds: [], Sections: []
                     };
-                    const section = document.createElement('section');
-                    section.className = 'verticalSection';
-                    section.style.marginBottom = '2em';
+                    const card = document.createElement('section');
+                    card.className = 'rhm-policy';
+                    card.dataset.policy = client.id;
 
-                    const heading = document.createElement('h3');
-                    heading.textContent = client.label;
+                    const header = document.createElement('div');
+                    header.className = 'rhm-policy-header';
+                    const titleWrap = document.createElement('div');
+                    const title = document.createElement('h3');
+                    title.textContent = client.label;
+                    const subtitle = document.createElement('div');
+                    subtitle.className = 'rhm-policy-subtitle';
+                    subtitle.textContent = client.subtitle;
+                    titleWrap.append(title, subtitle);
+                    const enabled = makeCheckbox('Activer cette politique', policy.Enabled, 'enabled', client.id);
+                    header.append(titleWrap, enabled.label);
 
-                    const enabledLabel = document.createElement('label');
-                    enabledLabel.className = 'emby-checkbox-label';
-                    const enabled = document.createElement('input');
-                    enabled.type = 'checkbox';
-                    enabled.is = 'emby-checkbox';
-                    enabled.dataset.enabled = client.id;
-                    enabled.checked = policy.Enabled === true;
-                    const enabledText = document.createElement('span');
-                    enabledText.textContent = 'Apply this policy to this client';
-                    enabledLabel.append(enabled, enabledText);
+                    const body = document.createElement('div');
+                    body.className = 'rhm-policy-body';
 
+                    const targetPanel = document.createElement('div');
+                    targetPanel.className = 'rhm-panel';
+                    const targetTitle = document.createElement('h4');
+                    targetTitle.textContent = 'Utilisateurs concernés';
+                    const identifierField = document.createElement('div');
+                    identifierField.className = 'rhm-field';
                     const identifierLabel = document.createElement('label');
-                    identifierLabel.className = 'inputLabel inputLabelUnfocused';
-                    identifierLabel.textContent = 'Exact client identifier';
+                    identifierLabel.textContent = 'Identifiant exact du client';
                     const identifier = document.createElement('input');
-                    identifier.type = 'text';
-                    identifier.is = 'emby-input';
+                    identifier.type = 'text'; identifier.is = 'emby-input';
                     identifier.dataset.identifier = client.id;
                     identifier.value = policy.ClientIdentifier || '';
-                    identifier.placeholder = 'Must match the client string sent to Jellyfin';
+                    identifier.placeholder = 'À vérifier pour cette application';
+                    identifierField.append(identifierLabel, identifier);
 
-                    const allUsersLabel = document.createElement('label');
-                    allUsersLabel.className = 'emby-checkbox-label';
-                    allUsersLabel.style.display = 'block';
-                    const allUsers = document.createElement('input');
-                    allUsers.type = 'checkbox';
-                    allUsers.is = 'emby-checkbox';
-                    allUsers.dataset.allUsers = client.id;
-                    allUsers.checked = policy.ApplyToAllUsers === true;
-                    const allUsersText = document.createElement('span');
-                    allUsersText.textContent = 'Apply to all users';
-                    allUsersLabel.append(allUsers, allUsersText);
-
+                    const allUsers = makeCheckbox('Appliquer à tous les utilisateurs', policy.ApplyToAllUsers, 'allUsers', client.id);
                     const usersLabel = document.createElement('label');
-                    usersLabel.className = 'inputLabel inputLabelUnfocused';
-                    usersLabel.textContent = 'Selected users (Ctrl/Cmd to select multiple)';
+                    usersLabel.textContent = 'Ou sélectionner des utilisateurs';
+                    usersLabel.style.display = 'block';
+                    usersLabel.style.margin = '.8em 0 .35em';
                     const usersSelect = document.createElement('select');
-                    usersSelect.multiple = true;
-                    usersSelect.size = Math.min(Math.max(availableUsers.length, 3), 8);
+                    usersSelect.multiple = true; usersSelect.size = Math.min(Math.max(availableUsers.length, 4), 9);
+                    usersSelect.className = 'rhm-users';
                     usersSelect.dataset.users = client.id;
-                    usersSelect.style.display = 'block';
-                    usersSelect.style.minWidth = '18em';
                     const selectedIds = new Set((policy.UserIds || []).map(id => String(id).toLowerCase()));
                     availableUsers.forEach(user => {
                         const option = document.createElement('option');
-                        option.value = user.Id;
-                        option.textContent = user.Name;
+                        option.value = user.Id; option.textContent = user.Name;
                         option.selected = selectedIds.has(String(user.Id).toLowerCase());
                         usersSelect.append(option);
                     });
-                    usersSelect.disabled = allUsers.checked;
+                    usersSelect.disabled = allUsers.input.checked;
+                    allUsers.input.addEventListener('change', () => usersSelect.disabled = allUsers.input.checked);
+                    const usersHelp = document.createElement('div');
+                    usersHelp.className = 'rhm-help';
+                    usersHelp.textContent = 'Maintiens Ctrl (Windows/Linux) ou Cmd (Mac) pour sélectionner plusieurs comptes.';
+                    targetPanel.append(targetTitle, identifierField, allUsers.label, usersLabel, usersSelect, usersHelp);
 
-                    allUsers.addEventListener('change', () => {
-                        usersSelect.disabled = allUsers.checked;
-                    });
+                    const sectionPanel = document.createElement('div');
+                    sectionPanel.className = 'rhm-panel';
+                    const sectionTitle = document.createElement('h4');
+                    sectionTitle.textContent = 'Sections de l’écran d’accueil';
+                    const sectionHelp = document.createElement('div');
+                    sectionHelp.className = 'rhm-help';
+                    sectionHelp.textContent = 'Coche les sections souhaitées. Utilise les flèches pour définir leur ordre d’affichage.';
+                    const sectionChoices = renderSectionChoices(client.id, policy.Sections || []);
+                    sectionPanel.append(sectionTitle, sectionHelp, sectionChoices);
 
-                    const sectionsLabel = document.createElement('label');
-                    sectionsLabel.className = 'inputLabel inputLabelUnfocused';
-                    sectionsLabel.textContent = 'Ordered home sections (maximum 10)';
-                    const sections = document.createElement('input');
-                    sections.type = 'text';
-                    sections.is = 'emby-input';
-                    sections.dataset.sections = client.id;
-                    sections.value = (policy.Sections || []).join(', ');
-                    sections.placeholder = 'SmallLibraryTiles, Resume, NextUp, None';
-
-                    const description = document.createElement('div');
-                    description.className = 'fieldDescription';
-                    description.textContent = 'Allowed values: ' + RaidtechHomeManager.sectionTypes.join(', ');
-
-                    section.append(heading, enabledLabel, identifierLabel, identifier, allUsersLabel, usersLabel, usersSelect, sectionsLabel, sections, description);
-                    fields.append(section);
+                    body.append(targetPanel, sectionPanel);
+                    card.append(header, body);
+                    fields.append(card);
                 });
             }
 
@@ -166,7 +304,7 @@
                     })
                     .catch(error => {
                         Dashboard.hideLoadingMsg();
-                        status.textContent = 'Could not load plugin configuration: ' + error;
+                        status.textContent = 'Impossible de charger la configuration : ' + error;
                     });
             });
 
@@ -177,23 +315,26 @@
                     .then(config => {
                         config.DisplayPreferencesId = document.querySelector('#DisplayPreferencesId').value.trim() || 'usersettings';
                         config.EnforcementEnabled = document.querySelector('#EnforcementEnabled').checked;
-                        config.Policies = RaidtechHomeManager.clients.map(client => ({
-                            ClientFamily: client.id,
-                            ClientIdentifier: fields.querySelector('[data-identifier="' + client.id + '"]').value.trim(),
-                            Enabled: fields.querySelector('[data-enabled="' + client.id + '"]').checked,
-                            ApplyToAllUsers: fields.querySelector('[data-all-users="' + client.id + '"]').checked,
-                            UserIds: Array.from(fields.querySelector('[data-users="' + client.id + '"]').selectedOptions).map(option => option.value),
-                            Sections: (fields.querySelector('[data-sections="' + client.id + '"]').value || '')
-                                .split(',')
-                                .map(value => value.trim())
-                                .filter(Boolean)
-                        }));
+                        config.Policies = RaidtechHomeManager.clients.map(client => {
+                            const card = fields.querySelector('[data-policy="' + client.id + '"]');
+                            const choices = card.querySelector('.rhm-sections').parentElement;
+                            const sectionContainer = choices;
+                            const selectedSections = sectionContainer.getSections ? sectionContainer.getSections() : [];
+                            return {
+                                ClientFamily: client.id,
+                                ClientIdentifier: card.querySelector('[data-identifier="' + client.id + '"]').value.trim(),
+                                Enabled: card.querySelector('[data-enabled="' + client.id + '"]').checked,
+                                ApplyToAllUsers: card.querySelector('[data-allUsers="' + client.id + '"]').checked,
+                                UserIds: Array.from(card.querySelector('[data-users="' + client.id + '"]').selectedOptions).map(option => option.value),
+                                Sections: selectedSections
+                            };
+                        });
                         return ApiClient.updatePluginConfiguration(RaidtechHomeManager.pluginUniqueId, config);
                     })
                     .then(result => Dashboard.processPluginConfigurationUpdateResult(result))
                     .catch(error => {
                         Dashboard.hideLoadingMsg();
-                        status.textContent = 'Could not save configuration: ' + error;
+                        status.textContent = 'Impossible d’enregistrer la configuration : ' + error;
                     });
             });
         </script>
