@@ -55,6 +55,18 @@ public sealed class ClientHomePolicy
     public bool Enabled { get; set; }
 
     /// <summary>
+    /// Gets or sets whether this policy explicitly targets every Jellyfin user.
+    /// Defaults to false so an upgraded configuration cannot unexpectedly affect everyone.
+    /// </summary>
+    public bool ApplyToAllUsers { get; set; }
+
+    /// <summary>
+    /// Gets or sets the allow-list of Jellyfin user IDs targeted by this policy.
+    /// Used when ApplyToAllUsers is false.
+    /// </summary>
+    public List<Guid> UserIds { get; set; } = [];
+
+    /// <summary>
     /// Gets or sets the ordered section identifiers.
     /// Supported values are Jellyfin HomeSectionType names.
     /// </summary>
