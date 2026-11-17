@@ -70,8 +70,13 @@ public sealed class HomePolicySyncTask : IScheduledTask
             return Task.CompletedTask;
         }
 
-        var users = _userManager.GetUsers().ToList();
-        var total = Math.Max(1, users.Count * policies.Count);
+        var allUsers = _userManager.GetUsers().ToList();
+        var targetedUsersByPolicy = policies.ToDictionary(
+            policy => policy,
+            policy => policy.ApplyToAllUsers
+                ? allUsers
+                : allUsers.Where(user => policy.UserIds.Contains(user.Id)).ToList());
+        var total = Math.Max(1, targetedUsersByPolicy.Values.Sum(users => users.Count));
         var completed = 0;
         var updated = 0;
         var unchanged = 0;
@@ -81,6 +86,15 @@ public sealed class HomePolicySyncTask : IScheduledTask
         foreach (var policy in policies)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var users = targetedUsersByPolicy[policy];
+
+            if (users.Count == 0)
+            {
+                _logger.LogInformation(
+                    "Policy {ClientFamily} has no targeted users. Enable ApplyToAllUsers or select specific user IDs.",
+                    policy.ClientFamily);
+                continue;
+            }
 
             if (policy.Sections.Count > 10)
             {
