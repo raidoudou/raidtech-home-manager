@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>Raidtech.HomeManager</AssemblyName>
+    <RootNamespace>Raidtech.HomeManager</RootNamespace>
+  </PropertyGroup>
+  <!-- Prototype only: verify Jellyfin 12.4 plugin SDK references and target framework before release. -->
+</Project>
