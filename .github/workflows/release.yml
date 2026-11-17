@@ -31,8 +31,11 @@ jobs:
           echo "guid=$(grep '^guid:' build.yaml | cut -d '"' -f 2)" >> "$GITHUB_OUTPUT"
           echo "target_abi=$(grep '^targetAbi:' build.yaml | cut -d '"' -f 2)" >> "$GITHUB_OUTPUT"
 
+      - name: Restore
+        run: dotnet restore Raidtech.HomeManager.sln
+
       - name: Build
-        run: dotnet publish Raidtech.HomeManager.sln --configuration Release --no-restore --output ./publish
+        run: dotnet publish src/Raidtech.HomeManager/Raidtech.HomeManager.csproj --configuration Release --no-restore --output ./publish
 
       - name: Package plugin
         shell: bash
