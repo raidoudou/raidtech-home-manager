@@ -156,7 +156,7 @@
                         checkbox.addEventListener('change', () => {
                             if (checkbox.checked) {
                                 if (item.id === 'None') {
-                                    selected.clear(); ordered.splice(0, ordered.length); ordered.push('None');
+                                    selected.clear(); selected.add('None'); ordered.splice(0, ordered.length); ordered.push('None');
                                 } else {
                                     selected.delete('None');
                                     const noneIndex = ordered.indexOf('None');
