@@ -1,11 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AssemblyName>Raidtech.HomeManager</AssemblyName>
     <RootNamespace>Raidtech.HomeManager</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  <!-- Prototype only: verify Jellyfin 12.4 plugin SDK references and target framework before release. -->
+
+  <ItemGroup>
+    <PackageReference Include="Jellyfin.Controller" Version="12.4.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Jellyfin.Model" Version="12.4.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>
