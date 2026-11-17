@@ -1,7 +1,7 @@
 ---
 name: "Raidtech Home Manager"
 guid: "9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71"
-version: "0.2.0.0"
+version: "0.2.1.0"
 targetAbi: "12.0.0.0"
 framework: "net10.0"
 overview: "Centralized home-screen preference policies for supported Jellyfin clients."
@@ -13,4 +13,4 @@ owner: "raidoudou"
 artifacts:
 - "Raidtech.HomeManager.dll"
 changelog: >
-  Adds explicit per-user targeting and a separate Emby policy entry.
+  Redesigned visual configuration with selectable home sections and per-user targeting.
