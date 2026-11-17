@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Raidtech Home Manager</title>
+</head>
+<body>
+    <div id="RaidtechHomeManagerPage" data-role="page" class="page type-interior pluginConfigurationPage">
+        <div data-role="content">
+            <div class="content-primary">
+                <h2>Raidtech Home Manager</h2>
+                <p>Configure the intended home-screen policy separately for each client family.</p>
+                <p><strong>Safety:</strong> policy storage only in this milestone. No user preferences are modified yet.</p>
+                <form id="RaidtechHomeManagerForm">
+                    <div id="policyFields"></div>
+                    <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                        <span>Save configuration</span>
+                    </button>
+                </form>
+                <div id="status" class="fieldDescription"></div>
+            </div>
+        </div>
+        <script>
+            const RaidtechHomeManager = {
+                pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
+                clients: [
+                    { id: 'web', label: 'Jellyfin Web' },
+                    { id: 'androidtv', label: 'Android TV' },
+                    { id: 'android', label: 'Android' },
+                    { id: 'ios', label: 'iOS' },
+                    { id: 'other', label: 'Other clients' }
+                ]
+            };
+
+            const page = document.querySelector('#RaidtechHomeManagerPage');
+            const fields = document.querySelector('#policyFields');
+            const status = document.querySelector('#status');
+
+            function renderPolicies(policies) {
+                fields.innerHTML = '';
+                RaidtechHomeManager.clients.forEach(client => {
+                    const policy = policies.find(p => p.clientFamily === client.id) || {
+                        clientFamily: client.id,
+                        enabled: false,
+                        sections: []
+                    };
+                    const section = document.createElement('section');
+                    section.className = 'verticalSection';
+                    section.style.marginBottom = '2em';
+                    const heading = document.createElement('h3');
+                    heading.textContent = client.label;
+                    const label = document.createElement('label');
+                    label.className = 'emby-checkbox-label';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.is = 'emby-checkbox';
+                    checkbox.dataset.client = client.id;
+                    checkbox.checked = policy.enabled;
+                    const span = document.createElement('span');
+                    span.textContent = 'Enable policy (enforcement not implemented yet)';
+                    label.append(checkbox, span);
+                    const inputLabel = document.createElement('label');
+                    inputLabel.className = 'inputLabel inputLabelUnfocused';
+                    inputLabel.textContent = 'Ordered section identifiers';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.is = 'emby-input';
+                    input.dataset.sections = client.id;
+                    input.value = (policy.sections || []).join(', ');
+                    input.placeholder = 'e.g. continueWatching, nextUp';
+                    const description = document.createElement('div');
+                    description.className = 'fieldDescription';
+                    description.textContent = 'Stored as a draft policy. Identifiers must be verified for this client before enforcement.';
+                    section.append(heading, label, inputLabel, input, description);
+                    fields.append(section);
+                });
+            }
+
+            page.addEventListener('pageshow', () => {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(RaidtechHomeManager.pluginUniqueId)
+                    .then(config => {
+                        renderPolicies(config.Policies || []);
+                        Dashboard.hideLoadingMsg();
+                    })
+                    .catch(error => {
+                        Dashboard.hideLoadingMsg();
+                        status.textContent = 'Could not load plugin configuration: ' + error;
+                    });
+            });
+
+            document.querySelector('#RaidtechHomeManagerForm').addEventListener('submit', event => {
+                event.preventDefault();
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(RaidtechHomeManager.pluginUniqueId)
+                    .then(config => {
+                        config.Policies = RaidtechHomeManager.clients.map(client => ({
+                            ClientFamily: client.id,
+                            Enabled: fields.querySelector('[data-client="' + client.id + '"]').checked,
+                            Sections: (fields.querySelector('[data-sections="' + client.id + '"]').value || '')
+                                .split(',')
+                                .map(value => value.trim())
+                                .filter(Boolean)
+                        }));
+                        return ApiClient.updatePluginConfiguration(RaidtechHomeManager.pluginUniqueId, config);
+                    })
+                    .then(result => Dashboard.processPluginConfigurationUpdateResult(result))
+                    .catch(error => {
+                        Dashboard.hideLoadingMsg();
+                        status.textContent = 'Could not save configuration: ' + error;
+                    });
+            });
+        </script>
+    </div>
+</body>
+</html>
