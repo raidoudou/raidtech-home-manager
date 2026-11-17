@@ -1,5 +1,7 @@
+using System.Globalization;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
+using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 using Raidtech.HomeManager.Configuration;
 
@@ -8,7 +10,7 @@ namespace Raidtech.HomeManager;
 /// <summary>
 /// Main entry point for Raidtech Home Manager.
 /// </summary>
-public sealed class Plugin : BasePlugin<PluginConfiguration>
+public sealed class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Plugin"/> class.
@@ -29,4 +31,17 @@ public sealed class Plugin : BasePlugin<PluginConfiguration>
     /// Gets the active plugin instance.
     /// </summary>
     public static Plugin? Instance { get; private set; }
+
+    /// <inheritdoc />
+    public IEnumerable<PluginPageInfo> GetPages()
+    {
+        yield return new PluginPageInfo
+        {
+            Name = Name,
+            EmbeddedResourcePath = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}.Configuration.configPage.html",
+                GetType().Namespace)
+        };
+    }
 }
