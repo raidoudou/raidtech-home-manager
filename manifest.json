@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "guid": "9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71",
+    "name": "Raidtech Home Manager",
+    "description": "Centralized home-screen preference policies for supported Jellyfin clients.",
+    "overview": "Manage Jellyfin home-screen sections with client-specific policies.",
+    "owner": "raidoudou",
+    "category": "General",
+    "versions": [
+      {
+        "version": "0.1.0.0",
+        "changelog": "See the GitHub release notes.",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/raidoudou/raidtech-home-manager/releases/download/v0.1.0.0/Raidtech.HomeManager.zip",
+        "checksum": "cef270f2d0076d2af27056a2912d9fcc",
+        "timestamp": "2026-11-17 13:38:19"
+      }
+    ]
+  }
+]
