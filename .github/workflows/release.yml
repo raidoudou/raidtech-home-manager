@@ -1,0 +1,114 @@
+name: Release plugin
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Read plugin metadata
+        id: metadata
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "guid=$(grep '^guid:' build.yaml | cut -d '"' -f 2)" >> "$GITHUB_OUTPUT"
+          echo "target_abi=$(grep '^targetAbi:' build.yaml | cut -d '"' -f 2)" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: dotnet publish Raidtech.HomeManager.sln --configuration Release --no-restore --output ./publish
+
+      - name: Package plugin
+        shell: bash
+        run: |
+          mkdir -p package
+          cp publish/Raidtech.HomeManager.dll package/
+          cat > package/meta.json <<EOF
+          {
+            "guid": "${{ steps.metadata.outputs.guid }}",
+            "name": "Raidtech Home Manager",
+            "description": "Centralized home-screen preference policies for supported Jellyfin clients.",
+            "overview": "Manage Jellyfin home-screen sections with client-specific policies.",
+            "owner": "raidoudou",
+            "category": "General",
+            "version": "${{ steps.metadata.outputs.version }}",
+            "targetAbi": "${{ steps.metadata.outputs.target_abi }}",
+            "timestamp": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+          cd package
+          zip -r ../Raidtech.HomeManager.zip .
+          cd ..
+          MD5=$(md5sum Raidtech.HomeManager.zip | cut -d ' ' -f 1)
+          echo "$MD5" > checksum.txt
+          echo "md5=$MD5" >> "$GITHUB_ENV"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            Raidtech.HomeManager.zip
+            checksum.txt
+
+      - name: Update Jellyfin repository manifest
+        shell: bash
+        run: |
+          VERSION="${{ steps.metadata.outputs.version }}"
+          GUID="${{ steps.metadata.outputs.guid }}"
+          TARGET_ABI="${{ steps.metadata.outputs.target_abi }}"
+          MD5="${{ env.md5 }}"
+          TIMESTAMP="$(date -u +'%Y-%m-%d %H:%M:%S')"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Raidtech.HomeManager.zip"
+          python3 - <<PY
+          import json
+          from pathlib import Path
+
+          manifest_path = Path("manifest.json")
+          manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else []
+          plugin = next((item for item in manifest if item.get("guid") == "$GUID"), None)
+          if plugin is None:
+              plugin = {
+                  "guid": "$GUID",
+                  "name": "Raidtech Home Manager",
+                  "description": "Centralized home-screen preference policies for supported Jellyfin clients.",
+                  "overview": "Manage Jellyfin home-screen sections with client-specific policies.",
+                  "owner": "raidoudou",
+                  "category": "General",
+                  "versions": []
+              }
+              manifest.append(plugin)
+
+          plugin["versions"] = [v for v in plugin.get("versions", []) if v.get("version") != "$VERSION"]
+          plugin["versions"].append({
+              "version": "$VERSION",
+              "changelog": "See the GitHub release notes.",
+              "targetAbi": "$TARGET_ABI",
+              "sourceUrl": "$DOWNLOAD_URL",
+              "checksum": "$MD5",
+              "timestamp": "$TIMESTAMP"
+          })
+          plugin["versions"].sort(key=lambda v: tuple(int(part) for part in v["version"].split(".")), reverse=True)
+          manifest_path.write_text(json.dumps(manifest, indent=2) + "\\n")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore: update plugin manifest for ${GITHUB_REF_NAME}"
+          git push origin HEAD:main
