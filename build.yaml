@@ -1,0 +1,16 @@
+---
+name: "Raidtech Home Manager"
+guid: "9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71"
+version: "0.1.0.0"
+targetAbi: "12.0.0.0"
+framework: "net10.0"
+overview: "Centralized home-screen preference policies for supported Jellyfin clients."
+description: >
+  Administrator-managed home-screen policies with client-specific capability
+  checks. Native client enforcement is only enabled for verified settings.
+category: "General"
+owner: "raidoudou"
+artifacts:
+- "Raidtech.HomeManager.dll"
+changelog: >
+  Initial Jellyfin 12.4 plugin foundation.
