@@ -9,9 +9,25 @@
         <div data-role="content">
             <div class="content-primary">
                 <h2>Raidtech Home Manager</h2>
-                <p>Configure the intended home-screen policy separately for each client family.</p>
-                <p><strong>Safety:</strong> policy storage only in this milestone. No user preferences are modified yet.</p>
+                <p>Define the server-side home-section policy separately for each client identifier.</p>
+                <div class="warningFieldDescription" style="margin-bottom:1em">
+                    <strong>Important:</strong> Jellyfin stores display preferences per user and per client identifier.
+                    A policy only affects clients that use the configured identifier and the server-side home-section
+                    preference API. This cannot force a client to render unsupported UI.
+                </div>
                 <form id="RaidtechHomeManagerForm">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="DisplayPreferencesId">Display preferences ID</label>
+                        <input id="DisplayPreferencesId" name="DisplayPreferencesId" type="text" is="emby-input" />
+                        <div class="fieldDescription">Usually usersettings. Keep this unchanged unless you have verified another identifier.</div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="EnforcementEnabled" type="checkbox" is="emby-checkbox" />
+                            <span>Enable enforcement globally</span>
+                        </label>
+                        <div class="fieldDescription">When disabled, the scheduled task performs no changes. Enable only after verifying each client identifier.</div>
+                    </div>
                     <div id="policyFields"></div>
                     <button is="emby-button" type="submit" class="raised button-submit block emby-button">
                         <span>Save configuration</span>
@@ -24,11 +40,15 @@
             const RaidtechHomeManager = {
                 pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
                 clients: [
-                    { id: 'web', label: 'Jellyfin Web' },
-                    { id: 'androidtv', label: 'Android TV' },
-                    { id: 'android', label: 'Android' },
-                    { id: 'ios', label: 'iOS' },
-                    { id: 'other', label: 'Other clients' }
+                    { id: 'web', label: 'Jellyfin Web', defaultIdentifier: 'Jellyfin Web' },
+                    { id: 'androidtv', label: 'Android TV', defaultIdentifier: 'Jellyfin Android TV' },
+                    { id: 'android', label: 'Android', defaultIdentifier: 'Jellyfin Android' },
+                    { id: 'ios', label: 'iOS', defaultIdentifier: 'Jellyfin iOS' },
+                    { id: 'other', label: 'Other clients', defaultIdentifier: '' }
+                ],
+                sectionTypes: [
+                    'None', 'SmallLibraryTiles', 'LibraryButtons', 'ActiveRecordings',
+                    'Resume', 'ResumeAudio', 'LatestMedia', 'NextUp', 'LiveTv', 'ResumeBook'
                 ]
             };
 
@@ -40,38 +60,54 @@
                 fields.innerHTML = '';
                 RaidtechHomeManager.clients.forEach(client => {
                     const policy = policies.find(p => p.ClientFamily === client.id) || {
-                        clientFamily: client.id,
+                        ClientFamily: client.id,
+                        ClientIdentifier: client.defaultIdentifier,
                         Enabled: false,
                         Sections: []
                     };
                     const section = document.createElement('section');
                     section.className = 'verticalSection';
                     section.style.marginBottom = '2em';
+
                     const heading = document.createElement('h3');
                     heading.textContent = client.label;
-                    const label = document.createElement('label');
-                    label.className = 'emby-checkbox-label';
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.is = 'emby-checkbox';
-                    checkbox.dataset.client = client.id;
-                    checkbox.checked = policy.Enabled;
-                    const span = document.createElement('span');
-                    span.textContent = 'Enable policy (enforcement not implemented yet)';
-                    label.append(checkbox, span);
-                    const inputLabel = document.createElement('label');
-                    inputLabel.className = 'inputLabel inputLabelUnfocused';
-                    inputLabel.textContent = 'Ordered section identifiers';
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.is = 'emby-input';
-                    input.dataset.sections = client.id;
-                    input.value = (policy.Sections || []).join(', ');
-                    input.placeholder = 'e.g. continueWatching, nextUp';
+
+                    const enabledLabel = document.createElement('label');
+                    enabledLabel.className = 'emby-checkbox-label';
+                    const enabled = document.createElement('input');
+                    enabled.type = 'checkbox';
+                    enabled.is = 'emby-checkbox';
+                    enabled.dataset.enabled = client.id;
+                    enabled.checked = policy.Enabled === true;
+                    const enabledText = document.createElement('span');
+                    enabledText.textContent = 'Apply this policy to this client';
+                    enabledLabel.append(enabled, enabledText);
+
+                    const identifierLabel = document.createElement('label');
+                    identifierLabel.className = 'inputLabel inputLabelUnfocused';
+                    identifierLabel.textContent = 'Exact client identifier';
+                    const identifier = document.createElement('input');
+                    identifier.type = 'text';
+                    identifier.is = 'emby-input';
+                    identifier.dataset.identifier = client.id;
+                    identifier.value = policy.ClientIdentifier || '';
+                    identifier.placeholder = 'Must match the client string sent to Jellyfin';
+
+                    const sectionsLabel = document.createElement('label');
+                    sectionsLabel.className = 'inputLabel inputLabelUnfocused';
+                    sectionsLabel.textContent = 'Ordered home sections (maximum 10)';
+                    const sections = document.createElement('input');
+                    sections.type = 'text';
+                    sections.is = 'emby-input';
+                    sections.dataset.sections = client.id;
+                    sections.value = (policy.Sections || []).join(', ');
+                    sections.placeholder = 'SmallLibraryTiles, Resume, NextUp, None';
+
                     const description = document.createElement('div');
                     description.className = 'fieldDescription';
-                    description.textContent = 'Stored as a draft policy. Identifiers must be verified for this client before enforcement.';
-                    section.append(heading, label, inputLabel, input, description);
+                    description.textContent = 'Allowed values: ' + RaidtechHomeManager.sectionTypes.join(', ');
+
+                    section.append(heading, enabledLabel, identifierLabel, identifier, sectionsLabel, sections, description);
                     fields.append(section);
                 });
             }
@@ -80,6 +116,8 @@
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(RaidtechHomeManager.pluginUniqueId)
                     .then(config => {
+                        document.querySelector('#DisplayPreferencesId').value = config.DisplayPreferencesId || 'usersettings';
+                        document.querySelector('#EnforcementEnabled').checked = config.EnforcementEnabled === true;
                         renderPolicies(config.Policies || []);
                         Dashboard.hideLoadingMsg();
                     })
@@ -94,9 +132,12 @@
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(RaidtechHomeManager.pluginUniqueId)
                     .then(config => {
+                        config.DisplayPreferencesId = document.querySelector('#DisplayPreferencesId').value.trim() || 'usersettings';
+                        config.EnforcementEnabled = document.querySelector('#EnforcementEnabled').checked;
                         config.Policies = RaidtechHomeManager.clients.map(client => ({
                             ClientFamily: client.id,
-                            Enabled: fields.querySelector('[data-client="' + client.id + '"]').checked,
+                            ClientIdentifier: fields.querySelector('[data-identifier="' + client.id + '"]').value.trim(),
+                            Enabled: fields.querySelector('[data-enabled="' + client.id + '"]').checked,
                             Sections: (fields.querySelector('[data-sections="' + client.id + '"]').value || '')
                                 .split(',')
                                 .map(value => value.trim())
