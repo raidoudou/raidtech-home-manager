@@ -4,87 +4,201 @@
     <meta charset="utf-8">
     <title>Raidtech Home Manager</title>
     <style>
-        #RaidtechHomeManagerPage { color: var(--primary-text-color, inherit); }
-        #RaidtechHomeManagerPage .rhm-intro { max-width: 900px; opacity: .82; margin-bottom: 1.4em; }
+        #RaidtechHomeManagerPage {
+            --rhm-accent: var(--theme-primary-color, #8b78ff);
+            --rhm-accent-soft: color-mix(in srgb, var(--rhm-accent) 16%, transparent);
+            --rhm-surface: rgba(18, 18, 23, .72);
+            --rhm-surface-strong: rgba(255, 255, 255, .055);
+            --rhm-border: rgba(255, 255, 255, .09);
+            --rhm-muted: rgba(255, 255, 255, .62);
+            color: var(--primary-text-color, #f5f5f7);
+            font-family: Quicksand, "Segoe UI", sans-serif;
+            padding-bottom: 2rem;
+        }
+        #RaidtechHomeManagerPage * { box-sizing: border-box; }
+        #RaidtechHomeManagerPage .rhm-shell { max-width: 1480px; margin: 0 auto; }
+        #RaidtechHomeManagerPage .rhm-hero {
+            position: relative; overflow: hidden; isolation: isolate;
+            padding: clamp(1.4rem, 3vw, 2.5rem);
+            margin: .5rem 0 1.5rem;
+            border: 1px solid var(--rhm-border); border-radius: 20px;
+            background: linear-gradient(115deg, rgba(139,120,255,.19), rgba(30,30,40,.72) 48%, rgba(255,255,255,.035));
+            box-shadow: 0 16px 48px rgba(0,0,0,.24);
+        }
+        #RaidtechHomeManagerPage .rhm-hero:after {
+            content: ""; position: absolute; z-index: -1; width: 260px; height: 260px;
+            right: -70px; top: -130px; border-radius: 50%;
+            background: var(--rhm-accent); filter: blur(90px); opacity: .22;
+        }
+        #RaidtechHomeManagerPage .rhm-brand { display:flex; align-items:center; gap:1rem; }
+        #RaidtechHomeManagerPage .rhm-brand-icon {
+            width: 58px; height:58px; flex:0 0 58px; display:grid; place-items:center;
+            border-radius:17px; color:white; font-size:27px;
+            background:linear-gradient(145deg, var(--rhm-accent), #5141a5);
+            box-shadow:0 8px 24px rgba(105,86,220,.32);
+        }
+        #RaidtechHomeManagerPage .rhm-hero h1 { margin:0; font-size:clamp(1.45rem,2.4vw,2rem); font-weight:700; letter-spacing:-.035em; }
+        #RaidtechHomeManagerPage .rhm-hero p { margin:.45rem 0 0; color:var(--rhm-muted); max-width:780px; line-height:1.55; }
+        #RaidtechHomeManagerPage .rhm-eyebrow { color:#b8adff; text-transform:uppercase; letter-spacing:.13em; font-size:.7rem; font-weight:700; margin-bottom:.35rem; }
         #RaidtechHomeManagerPage .rhm-global {
-            background: var(--card-background, rgba(255,255,255,.045));
-            border: 1px solid var(-- เบorder-color, rgba(255,255,255,.10));
-            border-radius: 12px; padding: 1.2em; margin: 1.2em 0 1.5em;
+            display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.8fr); gap:1.2rem;
+            padding:1.25rem; margin-bottom:1.4rem; border-radius:16px;
+            background:var(--rhm-surface); border:1px solid var(--rhm-border);
+            backdrop-filter:blur(18px); box-shadow:0 12px 40px rgba(0,0,0,.2);
         }
-        #RaidtechHomeManagerPage .rhm-global h3 { margin-top: 0; }
+        #RaidtechHomeManagerPage .rhm-block-title { display:flex; align-items:center; gap:.65rem; margin:0 0 .8rem; font-size:1.05rem; font-weight:700; }
+        #RaidtechHomeManagerPage .rhm-block-title .rhm-icon { color:#b8adff; font-size:1.25rem; }
+        #RaidtechHomeManagerPage .rhm-field label { display:block; margin-bottom:.4rem; font-size:.85rem; font-weight:600; }
+        #RaidtechHomeManagerPage .rhm-field input[type=text] {
+            width:100%; max-width:100%; min-height:42px; padding:.65rem .8rem;
+            border-radius:10px; border:1px solid var(--rhm-border);
+            background:rgba(0,0,0,.2); color:inherit;
+        }
+        #RaidtechHomeManagerPage .rhm-help { color:var(--rhm-muted); font-size:.78rem; line-height:1.5; margin-top:.45rem; }
+        #RaidtechHomeManagerPage .rhm-safety {
+            display:flex; align-items:flex-start; gap:.8rem; padding:1rem;
+            border-radius:12px; background:rgba(255,183,77,.075);
+            border:1px solid rgba(255,183,77,.18);
+        }
+        #RaidtechHomeManagerPage .rhm-safety .rhm-icon { color:#ffbf69; font-size:1.4rem; }
+        #RaidtechHomeManagerPage .rhm-safety strong { display:block; margin-bottom:.2rem; font-size:.9rem; }
+        #RaidtechHomeManagerPage .rhm-safety p { margin:0; color:var(--rhm-muted); font-size:.78rem; line-height:1.45; }
+        #RaidtechHomeManagerPage .rhm-policy-heading { display:flex; align-items:end; justify-content:space-between; gap:1rem; margin:1.8rem 0 .8rem; }
+        #RaidtechHomeManagerPage .rhm-policy-heading h2 { margin:0; font-size:1.25rem; font-weight:700; }
+        #RaidtechHomeManagerPage .rhm-policy-heading p { margin:.3rem 0 0; color:var(--rhm-muted); font-size:.82rem; }
         #RaidtechHomeManagerPage .rhm-policy {
-            background: var(--card-background, rgba(255,255,255,.035));
-            border: 1px solid rgba(255,255,255,.10);
-            border-radius: 12px; padding: 1.15em; margin: 1em 0;
+            margin:1rem 0; overflow:hidden; border-radius:17px;
+            border:1px solid var(--rhm-border); background:var(--rhm-surface);
+            box-shadow:0 12px 40px rgba(0,0,0,.19); backdrop-filter:blur(18px);
+            transition:border-color .2s, transform .2s, box-shadow .2s;
         }
+        #RaidtechHomeManagerPage .rhm-policy:hover { border-color:rgba(180,165,255,.25); box-shadow:0 16px 44px rgba(0,0,0,.26); }
+        #RaidtechHomeManagerPage .rhm-policy.is-enabled { border-color:rgba(139,120,255,.42); }
         #RaidtechHomeManagerPage .rhm-policy-header {
-            display:flex; align-items:center; justify-content:space-between;
-            gap:1em; flex-wrap:wrap; margin-bottom:.9em;
+            display:flex; align-items:center; justify-content:space-between; gap:1rem;
+            padding:1rem 1.2rem; border-bottom:1px solid var(--rhm-border);
+            background:linear-gradient(90deg,rgba(139,120,255,.09),transparent 65%);
         }
-        #RaidtechHomeManagerPage .rhm-policy-header h3 { margin:0; font-size:1.25em; }
-        #RaidtechHomeManagerPage .rhm-policy-subtitle { opacity:.68; font-size:.9em; margin-top:.2em; }
-        #RaidtechHomeManagerPage .rhm-policy-body { display:grid; grid-template-columns:minmax(230px, .8fr) minmax(320px, 1.5fr); gap:1.2em; }
-        #RaidtechHomeManagerPage .rhm-panel {
-            background:rgba(127,127,127,.07); border-radius:9px; padding:1em; min-width:0;
+        #RaidtechHomeManagerPage .rhm-client { display:flex; align-items:center; gap:.85rem; min-width:0; }
+        #RaidtechHomeManagerPage .rhm-client-icon {
+            display:grid; place-items:center; width:43px; height:43px; flex:0 0 43px;
+            border-radius:13px; color:#c8beff; background:var(--rhm-accent-soft); font-size:21px;
         }
-        #RaidtechHomeManagerPage .rhm-panel h4 { margin:0 0 .8em; font-size:1em; }
-        #RaidtechHomeManagerPage .rhm-field { margin:.8em 0; }
-        #RaidtechHomeManagerPage .rhm-field label { display:block; margin-bottom:.35em; }
-        #RaidtechHomeManagerPage .rhm-field input[type=text] { width:100%; max-width:100%; box-sizing:border-box; }
-        #RaidtechHomeManagerPage .rhm-help { font-size:.85em; opacity:.68; margin-top:.35em; }
-        #RaidtechHomeManagerPage .rhm-users { width:100%; min-height:9em; }
-        #RaidtechHomeManagerPage .rhm-sections { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.55em; }
+        #RaidtechHomeManagerPage .rhm-policy-header h3 { margin:0; font-size:1.02rem; font-weight:700; }
+        #RaidtechHomeManagerPage .rhm-policy-subtitle { color:var(--rhm-muted); font-size:.76rem; margin-top:.2rem; }
+        #RaidtechHomeManagerPage .rhm-status-pill {
+            display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .65rem;
+            border-radius:99px; color:var(--rhm-muted); background:rgba(255,255,255,.055);
+            font-size:.7rem; font-weight:700; white-space:nowrap;
+        }
+        #RaidtechHomeManagerPage .rhm-status-pill:before { content:""; width:6px; height:6px; border-radius:50%; background:#85858d; }
+        #RaidtechHomeManagerPage .is-enabled .rhm-status-pill { color:#b8adff; background:var(--rhm-accent-soft); }
+        #RaidtechHomeManagerPage .is-enabled .rhm-status-pill:before { background:#a797ff; box-shadow:0 0 9px #a797ff; }
+        #RaidtechHomeManagerPage .rhm-policy-body { display:grid; grid-template-columns:minmax(260px,.78fr) minmax(0,1.6fr); gap:1rem; padding:1rem; }
+        #RaidtechHomeManagerPage .rhm-panel { min-width:0; padding:1rem; border-radius:13px; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.055); }
+        #RaidtechHomeManagerPage .rhm-panel h4 { margin:0 0 .9rem; font-size:.88rem; font-weight:700; }
+        #RaidtechHomeManagerPage .rhm-field { margin:.7rem 0; }
+        #RaidtechHomeManagerPage .rhm-users {
+            width:100%; min-height:150px; padding:.45rem; border-radius:10px;
+            color:inherit; background:rgba(0,0,0,.22); border:1px solid var(--rhm-border);
+        }
+        #RaidtechHomeManagerPage .rhm-users option { padding:.35rem; }
+        #RaidtechHomeManagerPage .rhm-checkline { display:flex; align-items:center; gap:.55rem; margin:.55rem 0; font-size:.82rem; }
+        #RaidtechHomeManagerPage .rhm-checkline input { accent-color:var(--rhm-accent); }
+        #RaidtechHomeManagerPage .rhm-sections { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; }
         #RaidtechHomeManagerPage .rhm-section {
-            display:flex; align-items:center; gap:.65em; min-width:0;
-            padding:.65em .7em; border-radius:8px;
-            background:rgba(127,127,127,.10); border:1px solid transparent;
+            display:flex; align-items:center; gap:.65rem; min-width:0; min-height:58px;
+            padding:.65rem .7rem; border-radius:11px; cursor:pointer;
+            background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.065);
+            transition:background .18s,border-color .18s,transform .18s;
         }
-        #RaidtechHomeManagerPage .rhm-section.selected { border-color:var(--theme-primary-color, #00a4dc); background:rgba(0,164,220,.10); }
-        #RaidtechHomeManagerPage .rhm-section input { flex:0 0 auto; }
+        #RaidtechHomeManagerPage .rhm-section:hover { background:rgba(255,255,255,.065); transform:translateY(-1px); }
+        #RaidtechHomeManagerPage .rhm-section.selected { background:var(--rhm-accent-soft); border-color:rgba(164,148,255,.45); }
+        #RaidtechHomeManagerPage .rhm-section input { flex:0 0 auto; accent-color:var(--rhm-accent); width:16px; height:16px; }
         #RaidtechHomeManagerPage .rhm-section-name { flex:1; min-width:0; }
-        #RaidtechHomeManagerPage .rhm-section-name strong { display:block; font-size:.92em; }
-        #RaidtechHomeManagerPage .rhm-section-name small { display:block; opacity:.58; font-size:.76em; overflow-wrap:anywhere; }
-        #RaidtechHomeManagerPage .rhm-order { display:flex; gap:.2em; flex:0 0 auto; }
-        #RaidtechHomeManagerPage .rhm-order button { min-width:2em; padding:.25em; border-radius:6px; }
-        #RaidtechHomeManagerPage .rhm-selected-count { font-size:.85em; opacity:.7; margin:.5em 0 .8em; }
-        #RaidtechHomeManagerPage .rhm-actions { display:flex; gap:.5em; flex-wrap:wrap; margin-top:.8em; }
-        #RaidtechHomeManagerPage .rhm-muted { opacity:.55; }
-        #RaidtechHomeManagerPage .rhm-global-warning { color:var(--warning-color, #e6ad35); }
-        #RaidtechHomeManagerPage #status { margin-top:1em; }
-        @media(max-width:800px) {
+        #RaidtechHomeManagerPage .rhm-section-name strong { display:block; font-size:.8rem; font-weight:700; }
+        #RaidtechHomeManagerPage .rhm-section-name small { display:block; color:var(--rhm-muted); font-size:.68rem; margin-top:.15rem; line-height:1.3; }
+        #RaidtechHomeManagerPage .rhm-order { display:flex; flex:0 0 auto; gap:.2rem; }
+        #RaidtechHomeManagerPage .rhm-order button {
+            display:grid; place-items:center; width:25px; height:25px; min-width:25px; padding:0;
+            border:1px solid var(--rhm-border); border-radius:7px; color:inherit;
+            background:rgba(255,255,255,.07); cursor:pointer; transition:background .18s;
+        }
+        #RaidtechHomeManagerPage .rhm-order button:hover:not(:disabled) { background:var(--rhm-accent); }
+        #RaidtechHomeManagerPage .rhm-order button:disabled { opacity:.25; cursor:default; }
+        #RaidtechHomeManagerPage .rhm-selected-count { display:flex; align-items:center; justify-content:space-between; gap:.7rem; margin:.1rem 0 .8rem; color:var(--rhm-muted); font-size:.75rem; }
+        #RaidtechHomeManagerPage .rhm-count { color:#c7bdff; font-weight:700; }
+        #RaidtechHomeManagerPage .rhm-actions { display:flex; justify-content:flex-end; gap:.5rem; flex-wrap:wrap; margin-top:.8rem; }
+        #RaidtechHomeManagerPage .rhm-save {
+            min-height:48px; margin-top:1rem; border-radius:12px !important;
+            background:linear-gradient(105deg,#7865e8,#9a7cff) !important;
+            color:#fff !important; font-weight:700 !important; letter-spacing:.01em;
+            box-shadow:0 8px 24px rgba(112,91,225,.25);
+            transition:transform .2s,box-shadow .2s,filter .2s;
+        }
+        #RaidtechHomeManagerPage .rhm-save:hover { transform:translateY(-2px); filter:brightness(1.08); box-shadow:0 12px 30px rgba(112,91,225,.35); }
+        #RaidtechHomeManagerPage #status { margin-top:1rem; padding:.8rem 1rem; border-radius:10px; }
+        #RaidtechHomeManagerPage .rhm-icon { font-family:"Material Symbols Rounded","Material Icons",sans-serif; font-weight:normal; font-style:normal; line-height:1; }
+        #RaidtechHomeManagerPage .rhm-empty { color:var(--rhm-muted); font-size:.8rem; padding:.7rem; }
+        @media(max-width:900px) {
+            #RaidtechHomeManagerPage .rhm-global { grid-template-columns:1fr; }
             #RaidtechHomeManagerPage .rhm-policy-body { grid-template-columns:1fr; }
+        }
+        @media(max-width:600px) {
             #RaidtechHomeManagerPage .rhm-sections { grid-template-columns:1fr; }
+            #RaidtechHomeManagerPage .rhm-policy-header { align-items:flex-start; flex-direction:column; }
+            #RaidtechHomeManagerPage .rhm-hero { border-radius:14px; }
+        }
+        @media(prefers-reduced-motion:reduce) {
+            #RaidtechHomeManagerPage *, #RaidtechHomeManagerPage *:before { transition:none !important; }
         }
     </style>
 </head>
 <body>
     <div id="RaidtechHomeManagerPage" data-role="page" class="page type-interior pluginConfigurationPage">
         <div data-role="content">
-            <div class="content-primary">
-                <h2>Raidtech Home Manager</h2>
-                <p class="rhm-intro">Organise l'écran d'accueil de tes utilisateurs selon leur application Jellyfin ou Emby. Choisis les sections à afficher et leur ordre, sans avoir à saisir leurs identifiants techniques.</p>
-
-                <form id="RaidtechHomeManagerForm">
-                    <div class="rhm-global">
-                        <h3>Paramètres généraux</h3>
-                        <div class="rhm-field">
-                            <label class="inputLabel" for="DisplayPreferencesId">Identifiant des préférences d'affichage</label>
-                            <input id="DisplayPreferencesId" name="DisplayPreferencesId" type="text" is="emby-input" />
-                            <div class="rhm-help">Valeur habituelle : usersettings. Ne la modifie que si tu as vérifié un autre identifiant.</div>
-                        </div>
-                        <div class="checkboxContainer checkboxContainer-withDescription">
-                            <label class="emby-checkbox-label">
-                                <input id="EnforcementEnabled" type="checkbox" is="emby-checkbox" />
-                                <span>Activer l'application automatique des politiques</span>
-                            </label>
-                            <div class="rhm-help rhm-global-warning">Interrupteur général de sécurité. S'il est désactivé, aucune préférence utilisateur n'est modifiée.</div>
+            <div class="content-primary rhm-shell">
+                <header class="rhm-hero">
+                    <div class="rhm-eyebrow">RAIDTECH · MEDIA EXPERIENCE</div>
+                    <div class="rhm-brand">
+                        <div class="rhm-brand-icon rhm-icon">tune</div>
+                        <div>
+                            <h1>Home Manager</h1>
+                            <p>Compose l’écran d’accueil de chaque application, choisis qui bénéficie de tes réglages et maîtrise l’ordre des sections depuis un seul endroit.</p>
                         </div>
                     </div>
+                </header>
 
+                <form id="RaidtechHomeManagerForm">
+                    <section class="rhm-global">
+                        <div>
+                            <h2 class="rhm-block-title"><span class="rhm-icon">settings</span> Paramètres généraux</h2>
+                            <div class="rhm-field">
+                                <label for="DisplayPreferencesId">Identifiant des préférences d’affichage</label>
+                                <input id="DisplayPreferencesId" name="DisplayPreferencesId" type="text" is="emby-input" />
+                                <div class="rhm-help">Valeur habituelle : <strong>usersettings</strong>. Ne la modifie que si tu as vérifié un autre identifiant.</div>
+                            </div>
+                        </div>
+                        <div class="rhm-safety">
+                            <span class="rhm-icon">shield_lock</span>
+                            <div>
+                                <strong>Contrôle global des modifications</strong>
+                                <label class="rhm-checkline">
+                                    <input id="EnforcementEnabled" type="checkbox" is="emby-checkbox" />
+                                    <span>Activer l’application automatique des politiques</span>
+                                </label>
+                                <p>Lorsque cette option est désactivée, le plugin ne modifie aucune préférence utilisateur. Active-la uniquement après avoir vérifié tes politiques.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="rhm-policy-heading">
+                        <div><h2>Applications & politiques</h2><p>Configure chaque client indépendamment.</p></div>
+                    </div>
                     <div id="policyFields"></div>
 
-                    <button is="emby-button" type="submit" class="raised button-submit block emby-button">
-                        <span>Enregistrer la configuration</span>
+                    <button is="emby-button" type="submit" class="raised button-submit block emby-button rhm-save">
+                        <span class="rhm-icon">save</span>&nbsp; Enregistrer la configuration
                     </button>
                 </form>
                 <div id="status" class="fieldDescription" role="status"></div>
@@ -94,38 +208,37 @@
             const RaidtechHomeManager = {
                 pluginUniqueId: '9b0b46ce-3f5c-4c9a-92f2-2a86c62a4f71',
                 clients: [
-                    { id: 'web', label: 'Jellyfin Web', subtitle: 'Navigateur web Jellyfin', defaultIdentifier: 'emby' },
-                    { id: 'emby', label: 'Emby', subtitle: 'Application Emby', defaultIdentifier: '' },
-                    { id: 'androidtv', label: 'Android TV', subtitle: 'Téléviseurs et boîtiers Android TV', defaultIdentifier: 'Jellyfin Android TV' },
-                    { id: 'android', label: 'Android', subtitle: 'Téléphones et tablettes Android', defaultIdentifier: 'Jellyfin Android' },
-                    { id: 'ios', label: 'iOS', subtitle: 'iPhone et iPad', defaultIdentifier: 'Jellyfin iOS' },
-                    { id: 'other', label: 'Autres clients', subtitle: 'Client personnalisé', defaultIdentifier: '' }
+                    { id: 'web', label: 'Jellyfin Web', subtitle: 'Navigateur web Jellyfin', icon: 'language', defaultIdentifier: 'emby' },
+                    { id: 'emby', label: 'Emby', subtitle: 'Application Emby', icon: 'smart_display', defaultIdentifier: '' },
+                    { id: 'androidtv', label: 'Android TV', subtitle: 'Téléviseurs et boîtiers Android TV', icon: 'tv', defaultIdentifier: 'Jellyfin Android TV' },
+                    { id: 'android', label: 'Android', subtitle: 'Téléphones et tablettes Android', icon: 'phone_android', defaultIdentifier: 'Jellyfin Android' },
+                    { id: 'ios', label: 'iOS', subtitle: 'iPhone et iPad', icon: 'phone_iphone', defaultIdentifier: 'Jellyfin iOS' },
+                    { id: 'other', label: 'Autres clients', subtitle: 'Client personnalisé', icon: 'devices', defaultIdentifier: '' }
                 ],
                 sections: [
-                    { id:'SmallLibraryTiles', label:'Mes médiathèques', description:'Tuiles des bibliothèques' },
-                    { id:'LibraryButtons', label:'Boutons des médiathèques', description:'Accès rapide aux bibliothèques' },
-                    { id:'Resume', label:'Continuer de regarder', description:'Reprendre les films et séries' },
-                    { id:'ResumeAudio', label:'Reprendre la musique', description:'Écoutes audio en cours' },
-                    { id:'LatestMedia', label:'Derniers médias', description:'Ajouts récents aux bibliothèques' },
-                    { id:'NextUp', label:'À suivre', description:'Prochains épisodes' },
-                    { id:'ActiveRecordings', label:'Enregistrements actifs', description:'Enregistrements TV en cours' },
-                    { id:'LiveTv', label:'Télévision en direct', description:'Programmes TV en direct' },
-                    { id:'ResumeBook', label:'Reprendre la lecture', description:'Livres en cours' },
-                    { id:'None', label:'Aucune section', description:'Désactive les sections de l’accueil' }
+                    { id:'SmallLibraryTiles', label:'Mes médiathèques', description:'Tuiles des bibliothèques', icon:'video_library' },
+                    { id:'LibraryButtons', label:'Boutons des médiathèques', description:'Accès rapide aux bibliothèques', icon:'apps' },
+                    { id:'Resume', label:'Continuer de regarder', description:'Reprendre les films et séries', icon:'play_circle' },
+                    { id:'ResumeAudio', label:'Reprendre la musique', description:'Écoutes audio en cours', icon:'music_note' },
+                    { id:'LatestMedia', label:'Derniers médias', description:'Ajouts récents aux bibliothèques', icon:'new_releases' },
+                    { id:'NextUp', label:'À suivre', description:'Prochains épisodes', icon:'upcoming' },
+                    { id:'ActiveRecordings', label:'Enregistrements actifs', description:'Enregistrements TV en cours', icon:'radio_button_checked' },
+                    { id:'LiveTv', label:'Télévision en direct', description:'Programmes TV en direct', icon:'live_tv' },
+                    { id:'ResumeBook', label:'Reprendre la lecture', description:'Livres en cours', icon:'menu_book' },
+                    { id:'None', label:'Aucune section', description:'Désactive les sections de l’accueil', icon:'visibility_off' }
                 ]
             };
 
             const page = document.querySelector('#RaidtechHomeManagerPage');
-            const fields = document.querySelector('#policyFields');
-            const status = document.querySelector('#status');
+            const fields = page.querySelector('#policyFields');
+            const status = page.querySelector('#status');
             let availableUsers = [];
 
             function makeCheckbox(labelText, checked, dataAttribute, clientId) {
                 const label = document.createElement('label');
-                label.className = 'emby-checkbox-label';
+                label.className = 'rhm-checkline';
                 const input = document.createElement('input');
                 input.type = 'checkbox';
-                input.is = 'emby-checkbox';
                 input.checked = checked === true;
                 input.dataset[dataAttribute] = clientId;
                 const span = document.createElement('span');
@@ -134,7 +247,7 @@
                 return { label, input };
             }
 
-            function renderSectionChoices(clientId, savedSections) {
+            function renderSectionChoices(savedSections) {
                 const selected = new Set(savedSections || []);
                 const ordered = (savedSections || []).filter(id => RaidtechHomeManager.sections.some(section => section.id === id));
                 const container = document.createElement('div');
@@ -144,24 +257,34 @@
                 list.className = 'rhm-sections';
 
                 function refresh() {
-                    count.textContent = ordered.length + ' section(s) sélectionnée(s), dans l’ordre d’affichage';
+                    count.innerHTML = '';
+                    const summary = document.createElement('span');
+                    summary.textContent = 'Sections sélectionnées';
+                    const number = document.createElement('span');
+                    number.className = 'rhm-count';
+                    number.textContent = ordered.length + ' / 10';
+                    count.append(summary, number);
                     list.innerHTML = '';
                     RaidtechHomeManager.sections.forEach(item => {
-                        const row = document.createElement('div');
+                        const row = document.createElement('label');
                         row.className = 'rhm-section' + (selected.has(item.id) ? ' selected' : '');
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
                         checkbox.checked = selected.has(item.id);
+                        checkbox.disabled = !selected.has(item.id) && item.id !== 'None' && ordered.length >= 10;
                         checkbox.setAttribute('aria-label', 'Activer ' + item.label);
                         checkbox.addEventListener('change', () => {
                             if (checkbox.checked) {
                                 if (item.id === 'None') {
-                                    selected.clear(); selected.add('None'); ordered.splice(0, ordered.length); ordered.push('None');
+                                    selected.clear(); selected.add('None');
+                                    ordered.splice(0, ordered.length, 'None');
                                 } else {
                                     selected.delete('None');
                                     const noneIndex = ordered.indexOf('None');
                                     if (noneIndex >= 0) ordered.splice(noneIndex, 1);
-                                    if (!selected.has(item.id)) { selected.add(item.id); ordered.push(item.id); }
+                                    if (!selected.has(item.id) && ordered.length < 10) {
+                                        selected.add(item.id); ordered.push(item.id);
+                                    }
                                 }
                             } else {
                                 selected.delete(item.id);
@@ -185,16 +308,18 @@
                             order.className = 'rhm-order';
                             const position = ordered.indexOf(item.id);
                             const up = document.createElement('button');
-                            up.type = 'button'; up.textContent = '↑'; up.title = 'Monter';
+                            up.type = 'button'; up.textContent = '↑'; up.title = 'Monter'; up.setAttribute('aria-label','Monter ' + item.label);
                             up.disabled = position <= 0;
-                            up.addEventListener('click', () => {
+                            up.addEventListener('click', event => {
+                                event.preventDefault(); event.stopPropagation();
                                 if (position > 0) [ordered[position - 1], ordered[position]] = [ordered[position], ordered[position - 1]];
                                 refresh();
                             });
                             const down = document.createElement('button');
-                            down.type = 'button'; down.textContent = '↓'; down.title = 'Descendre';
+                            down.type = 'button'; down.textContent = '↓'; down.title = 'Descendre'; down.setAttribute('aria-label','Descendre ' + item.label);
                             down.disabled = position < 0 || position >= ordered.length - 1;
-                            down.addEventListener('click', () => {
+                            down.addEventListener('click', event => {
+                                event.preventDefault(); event.stopPropagation();
                                 if (position >= 0 && position < ordered.length - 1) [ordered[position], ordered[position + 1]] = [ordered[position + 1], ordered[position]];
                                 refresh();
                             });
@@ -218,11 +343,16 @@
                         Enabled: false, ApplyToAllUsers: false, UserIds: [], Sections: []
                     };
                     const card = document.createElement('section');
-                    card.className = 'rhm-policy';
+                    card.className = 'rhm-policy' + (policy.Enabled ? ' is-enabled' : '');
                     card.dataset.policy = client.id;
 
                     const header = document.createElement('div');
                     header.className = 'rhm-policy-header';
+                    const clientWrap = document.createElement('div');
+                    clientWrap.className = 'rhm-client';
+                    const icon = document.createElement('span');
+                    icon.className = 'rhm-client-icon rhm-icon';
+                    icon.textContent = client.icon;
                     const titleWrap = document.createElement('div');
                     const title = document.createElement('h3');
                     title.textContent = client.label;
@@ -230,8 +360,17 @@
                     subtitle.className = 'rhm-policy-subtitle';
                     subtitle.textContent = client.subtitle;
                     titleWrap.append(title, subtitle);
+                    clientWrap.append(icon, titleWrap);
                     const enabled = makeCheckbox('Activer cette politique', policy.Enabled, 'enabled', client.id);
-                    header.append(titleWrap, enabled.label);
+                    enabled.label.className = 'rhm-checkline';
+                    const enabledText = enabled.label.querySelector('span');
+                    enabledText.className = 'rhm-status-pill';
+                    enabledText.textContent = policy.Enabled ? 'Politique active' : 'Politique désactivée';
+                    enabled.input.addEventListener('change', () => {
+                        card.classList.toggle('is-enabled', enabled.input.checked);
+                        enabledText.textContent = enabled.input.checked ? 'Politique active' : 'Politique désactivée';
+                    });
+                    header.append(clientWrap, enabled.label);
 
                     const body = document.createElement('div');
                     body.className = 'rhm-policy-body';
@@ -239,7 +378,7 @@
                     const targetPanel = document.createElement('div');
                     targetPanel.className = 'rhm-panel';
                     const targetTitle = document.createElement('h4');
-                    targetTitle.textContent = 'Utilisateurs concernés';
+                    targetTitle.innerHTML = '<span class="rhm-icon">group</span> &nbsp; Utilisateurs concernés';
                     const identifierField = document.createElement('div');
                     identifierField.className = 'rhm-field';
                     const identifierLabel = document.createElement('label');
@@ -255,7 +394,8 @@
                     const usersLabel = document.createElement('label');
                     usersLabel.textContent = 'Ou sélectionner des utilisateurs';
                     usersLabel.style.display = 'block';
-                    usersLabel.style.margin = '.8em 0 .35em';
+                    usersLabel.style.margin = '1rem 0 .4rem';
+                    usersLabel.style.fontSize = '.8rem';
                     const usersSelect = document.createElement('select');
                     usersSelect.multiple = true; usersSelect.size = Math.min(Math.max(availableUsers.length, 4), 9);
                     usersSelect.className = 'rhm-users';
@@ -271,17 +411,18 @@
                     allUsers.input.addEventListener('change', () => usersSelect.disabled = allUsers.input.checked);
                     const usersHelp = document.createElement('div');
                     usersHelp.className = 'rhm-help';
-                    usersHelp.textContent = 'Maintiens Ctrl (Windows/Linux) ou Cmd (Mac) pour sélectionner plusieurs comptes.';
+                    usersHelp.textContent = 'Ctrl (Windows/Linux) ou Cmd (Mac) permet de sélectionner plusieurs comptes.';
                     targetPanel.append(targetTitle, identifierField, allUsers.label, usersLabel, usersSelect, usersHelp);
 
                     const sectionPanel = document.createElement('div');
                     sectionPanel.className = 'rhm-panel';
                     const sectionTitle = document.createElement('h4');
-                    sectionTitle.textContent = 'Sections de l’écran d’accueil';
+                    sectionTitle.innerHTML = '<span class="rhm-icon">dashboard_customize</span> &nbsp; Sections de l’écran d’accueil';
                     const sectionHelp = document.createElement('div');
                     sectionHelp.className = 'rhm-help';
-                    sectionHelp.textContent = 'Coche les sections souhaitées. Utilise les flèches pour définir leur ordre d’affichage.';
-                    const sectionChoices = renderSectionChoices(client.id, policy.Sections || []);
+                    sectionHelp.style.margin = '-.45rem 0 .8rem';
+                    sectionHelp.textContent = 'Coche les sections à afficher, puis utilise les flèches pour personnaliser leur ordre.';
+                    const sectionChoices = renderSectionChoices(policy.Sections || []);
                     sectionPanel.append(sectionTitle, sectionHelp, sectionChoices);
 
                     body.append(targetPanel, sectionPanel);
@@ -294,8 +435,8 @@
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(RaidtechHomeManager.pluginUniqueId)
                     .then(config => {
-                        document.querySelector('#DisplayPreferencesId').value = config.DisplayPreferencesId || 'usersettings';
-                        document.querySelector('#EnforcementEnabled').checked = config.EnforcementEnabled === true;
+                        page.querySelector('#DisplayPreferencesId').value = config.DisplayPreferencesId || 'usersettings';
+                        page.querySelector('#EnforcementEnabled').checked = config.EnforcementEnabled === true;
                         return ApiClient.getUsers().then(users => {
                             availableUsers = users || [];
                             renderPolicies(config.Policies || []);
@@ -308,24 +449,27 @@
                     });
             });
 
-            document.querySelector('#RaidtechHomeManagerForm').addEventListener('submit', event => {
+            page.querySelector('#RaidtechHomeManagerForm').addEventListener('submit', event => {
                 event.preventDefault();
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(RaidtechHomeManager.pluginUniqueId)
                     .then(config => {
-                        config.DisplayPreferencesId = document.querySelector('#DisplayPreferencesId').value.trim() || 'usersettings';
-                        config.EnforcementEnabled = document.querySelector('#EnforcementEnabled').checked;
+                        config.DisplayPreferencesId = page.querySelector('#DisplayPreferencesId').value.trim() || 'usersettings';
+                        config.EnforcementEnabled = page.querySelector('#EnforcementEnabled').checked;
                         config.Policies = RaidtechHomeManager.clients.map(client => {
                             const card = fields.querySelector('[data-policy="' + client.id + '"]');
-                            const choices = card.querySelector('.rhm-sections').parentElement;
-                            const sectionContainer = choices;
+                            const sectionContainer = card.querySelector('.rhm-sections').parentElement;
                             const selectedSections = sectionContainer.getSections ? sectionContainer.getSections() : [];
+                            const users = card.querySelector('[data-users="' + client.id + '"]');
+                            const enabledInput = card.querySelector('[data-enabled="' + client.id + '"]');
+                            const allUsersInput = card.querySelector('[data-all-users="' + client.id + '"]');
+                            const identifierInput = card.querySelector('[data-identifier="' + client.id + '"]');
                             return {
                                 ClientFamily: client.id,
-                                ClientIdentifier: card.querySelector('[data-identifier="' + client.id + '"]').value.trim(),
-                                Enabled: card.querySelector('[data-enabled="' + client.id + '"]').checked,
-                                ApplyToAllUsers: card.querySelector('[data-all-users="' + client.id + '"]').checked,
-                                UserIds: Array.from(card.querySelector('[data-users="' + client.id + '"]').selectedOptions).map(option => option.value),
+                                ClientIdentifier: identifierInput ? identifierInput.value.trim() : '',
+                                Enabled: enabledInput ? enabledInput.checked : false,
+                                ApplyToAllUsers: allUsersInput ? allUsersInput.checked : false,
+                                UserIds: users ? Array.from(users.selectedOptions).map(option => option.value) : [],
                                 Sections: selectedSections
                             };
                         });
